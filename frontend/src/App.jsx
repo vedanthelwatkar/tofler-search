@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
-function useDebounce(value, delay) {
+const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedValue(value), delay);
     return () => clearTimeout(timer);
   }, [value, delay]);
   return debouncedValue;
-}
+};
 
-function App() {
+const App = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,9 @@ function App() {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`);
+        const res = await fetch(
+          `/api/search?q=${encodeURIComponent(debouncedQuery)}`
+        );
         const data = await res.json();
         setResults(data);
       } catch (err) {
@@ -52,21 +54,19 @@ function App() {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {loading && <p className="status">Searching...</p>}
-
-      {!loading && query && results.length === 0 && (
+      {loading ? (
+        <p className="status">Searching...</p>
+      ) : query && results.length === 0 ? (
         <p className="status">No results found for "{query}"</p>
-      )}
-
-      {results.length > 0 && (
+      ) : results.length > 0 ? (
         <ul className="results">
           {results.map((company) => (
             <li key={company.id}>{company.name}</li>
           ))}
         </ul>
-      )}
+      ) : null}
     </div>
   );
-}
+};
 
 export default App;
